@@ -92,10 +92,10 @@ export default {
    */
   build: {
     vendor: ['papaparse'],
-    plugins: [
-      new webpack.IgnorePlugin({
-        resourceRegExp: /\@highcharts\/map\-collection/,
-      }),
-    ],
+    // plugins: [
+    //   new webpack.IgnorePlugin({
+    //     resourceRegExp: /\@highcharts\/map\-collection/,
+    //   }),
+    // ],
   },
 }

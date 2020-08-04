@@ -59,7 +59,7 @@ export default {
       return {
         name,
         data: data.map((item) => {
-          return [item[timeIndex], parseFloat(item[fieldIndex])]
+          return [Date.parse(item[timeIndex]), parseFloat(item[fieldIndex])]
         }),
       }
     },

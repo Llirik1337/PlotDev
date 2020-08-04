@@ -1,5 +1,5 @@
 import colors from 'vuetify/es5/util/colors'
-
+import webpack from 'webpack'
 export default {
   /*
    ** Nuxt rendering mode
@@ -58,6 +58,7 @@ export default {
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
     '@nuxtjs/pwa',
+    'nuxt-highcharts',
   ],
   /*
    ** Axios module configuration
@@ -89,5 +90,12 @@ export default {
    ** Build configuration
    ** See https://nuxtjs.org/api/configuration-build/
    */
-  build: {},
+  build: {
+    vendor: ['papaparse'],
+    plugins: [
+      new webpack.IgnorePlugin({
+        resourceRegExp: /\@highcharts\/map\-collection/,
+      }),
+    ],
+  },
 }

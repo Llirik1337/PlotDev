@@ -4,7 +4,7 @@
       График
     </v-card-title>
     <v-card-text>
-      <line-chart v-if="!loading" :data="data" :options="options" />
+      <chart-line-stock v-if="!loading" :options="options" />
     </v-card-text>
     <v-card-actions>
       <v-file-input
@@ -19,9 +19,11 @@
 
 <script>
 import Papa from 'papaparse'
+import ChartLineStock from '@/components/ChartLineStock'
+
 export default {
+  components: { ChartLineStock },
   data: () => ({
-    data: [],
     options: {},
     loading: true,
   }),
@@ -30,50 +32,36 @@ export default {
     upload(file) {
       if (file)
         Papa.parse(file, {
+          // header: true,
           complete: this.correctData,
         })
       else this.loading = true
     },
-    getRandomColor() {
-      const letters = '0123456789ABCDEF'
-      let color = '#'
-      for (let i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)]
+    correctData({ data }) {
+      // console.log(data)
+      const fields = data.slice(0, 1)[0].map((item) => item.trim())
+      console.log(fields)
+      const createSeries = (fieldIndex, name) =>
+        this.getSeries(data.slice(1, data.length), 0, fieldIndex, name)
+      const series = fields
+        .slice(1, fields.length)
+        .map((item, index) => createSeries(index + 1, item))
+      console.log(series)
+      this.options = {
+        title: {
+          text: 'График',
+        },
+        series,
       }
-      return color
-    },
-    correctData(result) {
-      const { data: fileData } = result
-      console.log(fileData)
-      const datasetsData = fileData.map((item) => [
-        ...item.slice(1, item.length),
-      ])
-      console.log(datasetsData)
-
-      const datasets = datasetsData[0].map((item, key) => {
-        const data = datasetsData
-          .slice(1, fileData.length)
-          .map((item, index) => item[key])
-        return {
-          label: item,
-          fill: false,
-          backgroundColor: this.getRandomColor(),
-          data,
-        }
-      })
-      console.log(JSON.stringify(datasets))
-
-      const data = {
-        labels: [
-          ...fileData.slice(1, fileData.length).map((item) => {
-            return item[0]
-          }),
-        ],
-        datasets,
-      }
-      console.log(data)
-      this.data = data
       this.loading = false
+    },
+    getSeries(data = [], timeIndex = 0, fieldIndex, name = '') {
+      return {
+        name,
+        data: data.map((item) => {
+          return [item[timeIndex], parseFloat(item[fieldIndex])]
+        }),
+      }
     },
   },
 }

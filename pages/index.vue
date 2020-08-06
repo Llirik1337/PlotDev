@@ -37,24 +37,29 @@ export default {
         })
       else this.loading = true
     },
+
     correctData({ data }) {
       // console.log(data)
       const fields = data.slice(0, 1)[0].map((item) => item.trim())
-      console.log(fields)
+      // console.log(fields)
+
       const createSeries = (fieldIndex, name) =>
         this.getSeries(data.slice(1, data.length), 0, fieldIndex, name)
       const series = fields
         .slice(1, fields.length)
         .map((item, index) => createSeries(index + 1, item))
-      console.log(series)
+
+      // console.log(series)
       this.options = {
         title: {
           text: 'График',
         },
         series,
       }
+
       this.loading = false
     },
+
     getSeries(data = [], timeIndex = 0, fieldIndex, name = '') {
       return {
         name,

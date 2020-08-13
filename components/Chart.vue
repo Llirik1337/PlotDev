@@ -1,9 +1,9 @@
 <template>
-  <div ref="chart"></div>
+  <div ref="container"></div>
 </template>
 
 <script>
-import Plotly from 'plotly.js'
+import Plotly from 'plotly.js-dist'
 
 export default {
   name: 'Chart',
@@ -43,8 +43,7 @@ export default {
     const layout = {
       title: 'Line and Scatter Plot',
     }
-
-    Plotly.react(this.$refs.chart, data, layout)
+    Plotly.react(this.$refs.container, data, layout)
   },
 }
 </script>

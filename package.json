@@ -39,6 +39,7 @@
     "eslint-plugin-prettier": "^3.1.4",
     "jest": "^26.1.0",
     "plotly.js": "^1.54.7",
+    "mathjs": "^7.1.0",
     "prettier": "^2.0.5",
     "vue-jest": "^3.0.4",
     "webpack": "^4.44.1"

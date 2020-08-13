@@ -4,7 +4,7 @@
       График
     </v-card-title>
     <v-card-text>
-      <chart-line-stock v-if="!loading" :options="options" />
+      <chart v-if="!loading" :options="options" />
     </v-card-text>
     <v-card-actions>
       <v-file-input
@@ -19,10 +19,8 @@
 
 <script>
 import Papa from 'papaparse'
-import ChartLineStock from '@/components/ChartLineStock'
 
 export default {
-  components: { ChartLineStock },
   data: () => ({
     options: {},
     loading: true,

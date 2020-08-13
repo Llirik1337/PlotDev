@@ -6,44 +6,37 @@
 import Plotly from 'plotly.js-dist'
 
 export default {
-  name: 'Chart',
   props: {
+    data: {
+      type: Object,
+      required: true,
+    },
     options: {
+      type: Object,
+      required: true,
+    },
+    layout: {
       type: Object,
       required: true,
     },
   },
   data: () => ({}),
-  computed: {
-    getOptions() {
-      return Object.assign(this.options, this.defaultOptions)
+  computed: {},
+
+  watch: {
+    data() {
+      this.upload()
     },
   },
+
   mounted() {
-    const trace1 = {
-      x: [1, 2, 3, 4],
-      y: [10, 15, 13, 17],
-      mode: 'markers',
-    }
+    this.upload()
+  },
 
-    const trace2 = {
-      x: [2, 3, 4, 5],
-      y: [16, 5, 11, 9],
-      mode: 'lines',
-    }
-
-    const trace3 = {
-      x: [1, 2, 3, 4],
-      y: [12, 9, 15, 12],
-      mode: 'lines+markers',
-    }
-
-    const data = [trace1, trace2, trace3]
-
-    const layout = {
-      title: 'Line and Scatter Plot',
-    }
-    Plotly.react(this.$refs.container, data, layout)
+  methods: {
+    upload() {
+      Plotly.newPlot(this.$refs.container, this.data, this.layout)
+    },
   },
 }
 </script>

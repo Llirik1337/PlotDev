@@ -23,7 +23,7 @@ import Papa from 'papaparse'
 export default {
   data: () => ({
     options: {},
-    loading: false,
+    loading: true,
     layout: {
       title: 'График',
     },
@@ -54,16 +54,31 @@ export default {
       this.loading = false
     },
 
-    getSeries(data = [], timeIndex = 0, fieldIndex, name = '') {
-      return {
+    getSeries(
+      data = [],
+      timeIndex = 0,
+      fieldIndex,
+
+      name = '',
+      options = {
+        type: 'scatter',
+        mode: 'lines',
+      }
+    ) {
+      const value = {
         name,
         x: data.map((item) => {
-          return [Date.parse(item[timeIndex])]
+          const x = new Date(item[timeIndex])
+          return x
         }),
         y: data.map((item) => {
-          return [parseFloat(item[fieldIndex])]
+          return parseFloat(item[fieldIndex])
         }),
       }
+
+      Object.assign(value, options)
+
+      return value
     },
   },
 }

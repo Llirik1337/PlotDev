@@ -8,7 +8,7 @@ import Plotly from 'plotly.js-dist'
 export default {
   props: {
     data: {
-      type: Object,
+      type: Array,
       required: true,
     },
     options: {
@@ -35,7 +35,7 @@ export default {
 
   methods: {
     upload() {
-      Plotly.newPlot(this.$refs.container, this.data, this.layout)
+      Plotly.react(this.$refs.container, this.data, this.layout)
     },
   },
 }

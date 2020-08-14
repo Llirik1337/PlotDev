@@ -4,7 +4,30 @@
       График
     </v-card-title>
     <v-card-text>
-      <chart v-if="!loading" :options="options" :data="data" :layout="layout" />
+      <v-row>
+        <v-col cols="2">
+          <v-text-field
+            v-model="top"
+            label="Задание верхнего порогового значения"
+          />
+          <v-text-field
+            v-model="bottom"
+            label="Задание нижнего погового значения"
+          />
+        </v-col>
+        <v-col cols="10">
+          <chart
+            v-if="!loading"
+            :options="options"
+            :range="range"
+            :data="data"
+            :layout="layout"
+            v-on:plot-click="click"
+            v-on:plot-zoom="zoom"
+            v-on:plot-hover="hover"
+          />
+        </v-col>
+      </v-row>
     </v-card-text>
     <v-card-actions>
       <v-file-input
@@ -27,10 +50,55 @@ export default {
     layout: {
       title: 'График',
     },
+    top: 0,
+    bottom: 0,
+    utils: [],
     data: [],
+    fileData: [],
+    range: [],
   }),
 
+  computed: {
+    average() {
+      return this.data.map((item) => {
+        return {}
+      })
+    },
+  },
+
+  watch: {
+    top() {
+      this.updateData(this.fileData)
+    },
+    bottom() {
+      this.updateData(this.fileData)
+    },
+  },
+
+  mounted() {},
+
   methods: {
+    // createAverage(data = [], options = {}) {
+    //   const defaultOptions = {
+    //     title: 'Cреднее арифметическое',
+    //     visible: false,
+    //     trace: '',
+    //     ...options,
+    //   }
+    //
+    //   return {
+    //     name: `${defaultOptions.title} (${defaultOptions.trace})`,
+    //   }
+    // },
+    //
+    // calcAverage(range = []) {},
+
+    createPlank(options = { name: 'Линия', x: [], y: [] }) {
+      return {
+        ...options,
+      }
+    },
+
     upload(file) {
       if (file)
         Papa.parse(file, {
@@ -45,20 +113,23 @@ export default {
       const createSeries = (fieldIndex, name) =>
         this.getSeries(data.slice(1, data.length), 0, fieldIndex, name)
 
-      this.data = fields
+      this.fileData = fields
         .slice(1, fields.length)
         .map((item, index) => createSeries(index + 1, item))
 
-      console.log(this.data)
-
+      this.range = this.getGlobalRange(data)
+      this.updateData(this.fileData)
       this.loading = false
+    },
+
+    updateData(data) {
+      this.data = [...data, ...this.updateUtils(data)]
     },
 
     getSeries(
       data = [],
       timeIndex = 0,
       fieldIndex,
-
       name = '',
       options = {
         type: 'scatter',
@@ -75,10 +146,34 @@ export default {
           return parseFloat(item[fieldIndex])
         }),
       }
-
       Object.assign(value, options)
-
       return value
+    },
+
+    getGlobalRange(data) {
+      return [data[1][0], data[data.length - 2][0]]
+    },
+
+    updateUtils(data) {
+      return [
+        this.createPlank({
+          name: 'Вехняя граница',
+          x: this.range,
+          y: [this.top, this.top],
+        }),
+        this.createPlank({
+          name: 'Нижняя граница',
+          x: this.range,
+          y: [this.bottom, this.bottom],
+        }),
+      ]
+    },
+
+    click(data) {},
+    hover(data) {},
+    zoom(data) {
+      console.log('zoom')
+      console.log(data)
     },
   },
 }

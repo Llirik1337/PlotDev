@@ -19,9 +19,40 @@ export default {
       type: Object,
       required: true,
     },
+    range: {
+      type: Array,
+      required: true,
+    },
   },
-  data: () => ({}),
-  computed: {},
+  data: () => ({
+    defaultSettings: {
+      layout: {
+        xaxis: {
+          type: 'date',
+          // range: this.range,
+          gridcolor: '#767',
+        },
+        yaxis: { gridcolor: '#767' },
+      },
+    },
+    chart: {
+      layout: {},
+    },
+  }),
+  computed: {
+    container() {
+      return this.$refs.container
+    },
+    getLayout() {
+      return {
+        ...this.defaultSettings.layout,
+        ...this.layout,
+      }
+    },
+    getData() {
+      return [...this.data]
+    },
+  },
 
   watch: {
     data() {
@@ -34,8 +65,15 @@ export default {
   },
 
   methods: {
+    initEvents() {
+      this.container
+        .on('plotly_click', (data) => this.$emit('plot-click', data))
+        .on('plotly_hover', (data) => this.$emit('plot-hover', data))
+        .on('plotly_relayout', (data) => this.$emit('plot-zoom', data))
+    },
     upload() {
-      Plotly.react(this.$refs.container, this.data, this.layout)
+      Plotly.react(this.container, this.data, this.getLayout)
+      this.initEvents()
     },
   },
 }

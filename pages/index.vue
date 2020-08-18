@@ -5,26 +5,18 @@
     </v-card-title>
     <v-card-text>
       <v-row>
-        <v-col cols="2">
-          <v-text-field
-            v-model="top"
-            label="Задание верхнего порогового значения"
-          />
-          <v-text-field
-            v-model="bottom"
-            label="Задание нижнего погового значения"
-          />
+        <v-col cols="3">
+          <n-input label="Вехняя граница" @save="updateTop" />
+          <n-input label="Нижняя граница" @save="updateBottom" />
         </v-col>
-        <v-col cols="10">
+        <v-col>
           <chart
             v-if="!loading"
             :options="options"
             :range="range"
             :data="data"
             :layout="layout"
-            v-on:plot-click="click"
-            v-on:plot-zoom="zoom"
-            v-on:plot-hover="hover"
+            @plot-zoom="zoom"
           />
         </v-col>
       </v-row>
@@ -50,8 +42,18 @@ export default {
     layout: {
       title: 'График',
     },
-    top: 0,
-    bottom: 0,
+    top: {
+      value: 0,
+      visible: 'legendonly',
+    },
+    bottom: {
+      value: 0,
+      visible: 'legendonly',
+    },
+    average: {
+      value: 0,
+      visible: 'legendonly',
+    },
     utils: [],
     data: [],
     fileData: [],
@@ -59,44 +61,80 @@ export default {
   }),
 
   computed: {
-    average() {
-      return this.data.map((item) => {
-        return {}
+    calcAverage() {
+      return 150
+    },
+    plankTop() {
+      return this.createPlank({
+        name: 'Вехняя граница',
+        visible: this.top.visible,
+        x: this.range,
+        y: [this.top.value, this.top.value],
       })
     },
-  },
-
-  watch: {
-    top() {
-      this.updateData(this.fileData)
+    plankBottom() {
+      return this.createPlank({
+        name: 'Нижняя граница',
+        visible: this.bottom.visible,
+        x: this.range,
+        y: [this.bottom.value, this.bottom.value],
+        line: {
+          dash: 'dot',
+          color: 'red',
+        },
+      })
     },
-    bottom() {
-      this.updateData(this.fileData)
+    plankAverage() {
+      return this.createPlank({
+        name: 'Среднее значение',
+        visible: this.average.visible,
+        x: this.range,
+        y: [this.average.value, this.average.value],
+        line: {
+          dash: 'dot',
+          color: 'gray',
+        },
+      })
     },
   },
 
   mounted() {},
 
   methods: {
-    // createAverage(data = [], options = {}) {
-    //   const defaultOptions = {
-    //     title: 'Cреднее арифметическое',
-    //     visible: false,
-    //     trace: '',
-    //     ...options,
-    //   }
-    //
-    //   return {
-    //     name: `${defaultOptions.title} (${defaultOptions.trace})`,
-    //   }
-    // },
-    //
-    // calcAverage(range = []) {},
+    updateTop(value) {
+      if (value < this.bottom.value) return
+      this.top.value = value
+      this.top.visible = true
+      this.updateData(this.fileData)
+    },
+    updateBottom(value) {
+      if (value > this.top.value) return
+      this.bottom.value = value
+      this.bottom.visible = true
+      this.updateData(this.fileData)
+    },
+    updateAverage() {
+      this.average.value = this.calcAverage
+      this.average.visible = true
+      this.updateData(this.fileData)
+    },
 
-    createPlank(options = { name: 'Линия', x: [], y: [] }) {
-      return {
-        ...options,
+    createPlank(options) {
+      const defaultOptions = {
+        type: 'scatter',
+        name: 'Линия',
+        x: [],
+        y: [],
+        mode: 'lines',
+        visible: 'legendonly',
+        showlegend: true,
+        line: {
+          color: 'red',
+          width: 2,
+          dash: 'dash',
+        },
       }
+      return { ...defaultOptions, ...options }
     },
 
     upload(file) {
@@ -116,14 +154,13 @@ export default {
       this.fileData = fields
         .slice(1, fields.length)
         .map((item, index) => createSeries(index + 1, item))
-
       this.range = this.getGlobalRange(data)
       this.updateData(this.fileData)
       this.loading = false
     },
 
     updateData(data) {
-      this.data = [...data, ...this.updateUtils(data)]
+      this.data = [...data, this.plankBottom, this.plankTop, this.plankAverage]
     },
 
     getSeries(
@@ -154,26 +191,53 @@ export default {
       return [data[1][0], data[data.length - 2][0]]
     },
 
-    updateUtils(data) {
-      return [
-        this.createPlank({
-          name: 'Вехняя граница',
-          x: this.range,
-          y: [this.top, this.top],
-        }),
-        this.createPlank({
-          name: 'Нижняя граница',
-          x: this.range,
-          y: [this.bottom, this.bottom],
-        }),
-      ]
+    // updateUtils(data) {
+    //   // console.log(this.range)
+    //   // const top = this.createPlank({
+    //   //   name: 'Вехняя граница',
+    //   //   visible: this.top.visible,
+    //   //   x: this.range,
+    //   //   y: [this.top, this.top],
+    //   // })
+    //
+    //   const bottom = this.createPlank({
+    //     name: 'Нижняя граница',
+    //     visible: this.bottom.visible,
+    //     x: this.range,
+    //     y: [this.bottom, this.bottom],
+    //     line: {
+    //       dash: 'dot',
+    //     },
+    //   })
+    //
+    //   const average = this.createPlank({
+    //     name: 'Среднее значение',
+    //     visible: this.average.visible,
+    //     x: this.range,
+    //     y: [this.average.value, this.average.value],
+    //     line: {
+    //       dash: 'dot',
+    //     },
+    //   })
+    //
+    //   // console.log(top)
+    //
+    //   return [top, bottom, average]
+    // },
+
+    dateRound(value) {
+      return Math.round(Date.parse(value) / 1000) * 1000
     },
 
-    click(data) {},
-    hover(data) {},
     zoom(data) {
-      console.log('zoom')
       console.log(data)
+      this.range = [
+        this.dateRound(data['xaxis.range[0]']),
+        this.dateRound(data['xaxis.range[1]']),
+      ]
+      console.log(this.range)
+      this.average.value = this.calcAverage
+      console.log(this.range)
     },
   },
 }

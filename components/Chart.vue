@@ -29,10 +29,10 @@ export default {
       layout: {
         xaxis: {
           type: 'date',
-          // range: this.range,
           gridcolor: '#767',
+          nticks: 2,
         },
-        yaxis: { gridcolor: '#767' },
+        yaxis: { gridcolor: '#767', type: 'linear' },
       },
     },
     chart: {

@@ -5,7 +5,15 @@
     </v-card-title>
     <v-card-text v-if="!loading">
       <v-row>
-        <v-col cols="12">
+        <v-col cols="3">
+          <chart-input label="Вехняя граница" @save="updateTop" />
+          <chart-input label="Нижняя граница" @save="updateBottom" />
+          <chart-select
+            :items="selectedItem"
+            @select="selectAverage"
+          ></chart-select>
+        </v-col>
+        <v-col>
           <div v-if="range">
             {{ new Date(range[0]).toISOString().split('.')[0] }} -
             {{ new Date(range[1]).toISOString().split('.')[0] }}
@@ -18,14 +26,6 @@
             :layout="layout"
             @plot-click="click"
           />
-        </v-col>
-        <v-col cols="3">
-          <chart-input label="Вехняя граница" @save="updateTop" />
-          <chart-input label="Нижняя граница" @save="updateBottom" />
-          <chart-select
-            :items="selectedItem"
-            @select="selectAverage"
-          ></chart-select>
         </v-col>
       </v-row>
     </v-card-text>

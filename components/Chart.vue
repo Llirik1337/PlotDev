@@ -1,5 +1,5 @@
 <template>
-  <div ref="container"></div>
+  <div ref="container" class="main"></div>
 </template>
 
 <script>
@@ -27,7 +27,9 @@ export default {
   data: () => ({
     defaultSettings: {
       layout: {
+        autosize: true,
         height: 600,
+        // width: 800,
         xaxis: {
           type: 'date',
           gridcolor: '#767',
@@ -80,10 +82,9 @@ export default {
       Plotly.react(this.container, this.data, this.getLayout, {
         scrollZoom: true,
         displaylogo: false,
+        responsive: true,
       })
     },
   },
 }
 </script>
-
-<style scoped></style>

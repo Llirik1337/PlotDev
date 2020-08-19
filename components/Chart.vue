@@ -28,7 +28,7 @@ export default {
     defaultSettings: {
       layout: {
         autosize: true,
-        height: 600,
+        // height: 600,
         // width: 800,
         xaxis: {
           type: 'date',

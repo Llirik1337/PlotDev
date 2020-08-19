@@ -5,15 +5,12 @@
     </v-card-title>
     <v-card-text v-if="!loading">
       <v-row>
-        <v-col cols="3">
-          <chart-input label="Вехняя граница" @save="updateTop" />
-          <chart-input label="Нижняя граница" @save="updateBottom" />
-          <chart-select
-            :items="selectedItem"
-            @select="selectAverage"
-          ></chart-select>
-        </v-col>
-        <v-col>
+        <v-col cols="12">
+          <div v-if="range">
+            {{ new Date(range[0]).toISOString().split('.')[0] }} -
+            {{ new Date(range[1]).toISOString().split('.')[0] }}
+          </div>
+
           <chart
             :options="options"
             :range="range"
@@ -21,6 +18,14 @@
             :layout="layout"
             @plot-click="click"
           />
+        </v-col>
+        <v-col cols="3">
+          <chart-input label="Вехняя граница" @save="updateTop" />
+          <chart-input label="Нижняя граница" @save="updateBottom" />
+          <chart-select
+            :items="selectedItem"
+            @select="selectAverage"
+          ></chart-select>
         </v-col>
       </v-row>
     </v-card-text>
@@ -62,21 +67,35 @@ export default {
     data: [],
     traces: [],
     // range: [],
-    leftIndex: 0,
-    rightIndex: 0,
+    leftIndex: null,
+    rightIndex: null,
     isLeft: false,
     selectedItem: [],
     fileData: [],
   }),
 
   computed: {
+    range() {
+      if (!this.leftIndex || !this.rightIndex) return false
+      if (this.rightIndex < this.leftIndex)
+        return [
+          Date.parse(this.fileData[this.rightIndex][0]),
+          Date.parse(this.fileData[this.leftIndex][0]),
+        ]
+      return [
+        Date.parse(this.fileData[this.leftIndex][0]),
+        Date.parse(this.fileData[this.rightIndex][0]),
+      ]
+    },
+
     left() {
-      // console.log(this.fileData)
-      console.log(this.fileData[this.rightIndex][0])
+      if (this.leftIndex === null) return false
+      // console.log(this.fileData[this.leftIndex][0])
       return Date.parse(this.fileData[this.leftIndex][0])
     },
     right() {
-      // console.log(this.fileData)
+      if (this.rightIndex === null) return false
+      console.log(this.rightIndex)
       // console.log(this.fileData[this.rightIndex][0])
       return Date.parse(this.fileData[this.rightIndex][0])
     },
@@ -240,10 +259,8 @@ export default {
         text: item.name,
       }))
 
-      // this.leftIndex = 1
-      // this.rightIndex = this.data.length - 1
-
-      // console.log(this.range)
+      this.leftIndex = 1
+      this.rightIndex = this.fileData.length - 2
 
       this.updateShapes()
       this.updateData(this.traces)

@@ -15,8 +15,8 @@
         </v-col>
         <v-col>
           <div v-if="range">
-            {{ new Date(range[0]).toISOString().split('.')[0] }} -
-            {{ new Date(range[1]).toISOString().split('.')[0] }}
+            {{ rangeFile[0] }} -
+            {{ rangeFile[1] }}
           </div>
 
           <chart
@@ -66,26 +66,36 @@ export default {
     utils: [],
     data: [],
     traces: [],
-    // range: [],
     leftIndex: null,
     rightIndex: null,
     isLeft: false,
-    selectedItem: [],
+    selectedItem: [
+      {
+        text: 'Все',
+        value: null,
+      },
+    ],
+    currentItem: 0,
     fileData: [],
   }),
 
   computed: {
-    range() {
+    rangeIndex() {
       if (!this.leftIndex || !this.rightIndex) return false
       if (this.rightIndex < this.leftIndex)
-        return [
-          Date.parse(this.fileData[this.rightIndex][0]),
-          Date.parse(this.fileData[this.leftIndex][0]),
-        ]
+        return [this.rightIndex, this.leftIndex]
+      else return [this.leftIndex, this.rightIndex]
+    },
+    rangeFile() {
+      if (!this.leftIndex || !this.rightIndex) return false
       return [
-        Date.parse(this.fileData[this.leftIndex][0]),
-        Date.parse(this.fileData[this.rightIndex][0]),
+        this.fileData[this.rangeIndex[0]][0],
+        this.fileData[this.rangeIndex[1]][0],
       ]
+    },
+    range() {
+      if (!this.leftIndex || !this.rightIndex) return false
+      return [Date.parse(this.rangeFile[0]), Date.parse(this.rangeFile[1])]
     },
 
     left() {
@@ -107,7 +117,24 @@ export default {
     },
 
     calcAverage() {
-      return 150
+      const left = this.rangeIndex[0]
+      const right = this.rangeIndex[1]
+      let data = []
+      console.log(this.currentItem)
+      if (this.currentItem !== null) {
+        const yValues = this.traces[this.currentItem].y
+        data = yValues.slice(left, right)
+      } else {
+        for (const trace of this.traces) {
+          data = data.concat(trace.y.slice(left, right))
+        }
+      }
+      // console.log(data)
+      // if (!data.length) return 0
+
+      const mean = this.$math.mean(data)
+      console.log(mean)
+      return mean
     },
 
     leftLine() {
@@ -138,6 +165,7 @@ export default {
       })
     },
     plankAverage() {
+      console.log(this.range)
       return this.createPlank({
         name: 'Среднее значение',
         visible: this.average.visible,
@@ -151,11 +179,23 @@ export default {
     },
   },
 
-  mounted() {},
+  watch: {
+    // currentItem() {
+    //   this.updateAverage()
+    // },
+    // leftIndex() {
+    //   this.updateAverage()
+    // },
+    // rightIndex() {
+    //   this.updateAverage()
+    // },
+  },
 
   methods: {
     selectAverage(item) {
-      console.log(item)
+      // console.log(item)
+      this.currentItem = item
+      this.updateAverage()
     },
 
     click(data) {
@@ -254,10 +294,13 @@ export default {
         .slice(1, fields.length)
         .map((item, index) => createSeries(index + 1, item))
       this.range = this.getGlobalRange(data)
-      this.selectedItem = this.traces.map((item, index) => ({
-        value: index,
-        text: item.name,
-      }))
+      this.selectedItem = [
+        ...this.selectedItem,
+        ...this.traces.map((item, index) => ({
+          value: index,
+          text: item.name,
+        })),
+      ]
 
       this.leftIndex = 1
       this.rightIndex = this.fileData.length - 2

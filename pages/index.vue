@@ -3,20 +3,23 @@
     <v-card-title>
       График
     </v-card-title>
-    <v-card-text>
+    <v-card-text v-if="!loading">
       <v-row>
         <v-col cols="3">
-          <n-input label="Вехняя граница" @save="updateTop" />
-          <n-input label="Нижняя граница" @save="updateBottom" />
+          <chart-input label="Вехняя граница" @save="updateTop" />
+          <chart-input label="Нижняя граница" @save="updateBottom" />
+          <chart-select
+            :items="selectedItem"
+            @select="selectAverage"
+          ></chart-select>
         </v-col>
         <v-col>
           <chart
-            v-if="!loading"
             :options="options"
             :range="range"
             :data="data"
             :layout="layout"
-            @plot-zoom="zoom"
+            @plot-click="click"
           />
         </v-col>
       </v-row>
@@ -39,8 +42,9 @@ export default {
   data: () => ({
     options: {},
     loading: true,
-    layout: {
+    defaultLayout: {
       title: 'График',
+      shapes: [],
     },
     top: {
       value: 0,
@@ -56,14 +60,44 @@ export default {
     },
     utils: [],
     data: [],
+    traces: [],
+    // range: [],
+    leftIndex: 0,
+    rightIndex: 0,
+    isLeft: false,
+    selectedItem: [],
     fileData: [],
-    range: [],
   }),
 
   computed: {
+    left() {
+      // console.log(this.fileData)
+      console.log(this.fileData[this.rightIndex][0])
+      return Date.parse(this.fileData[this.leftIndex][0])
+    },
+    right() {
+      // console.log(this.fileData)
+      // console.log(this.fileData[this.rightIndex][0])
+      return Date.parse(this.fileData[this.rightIndex][0])
+    },
+
+    layout() {
+      return {
+        ...this.defaultLayout,
+      }
+    },
+
     calcAverage() {
       return 150
     },
+
+    leftLine() {
+      return this.createVerticalLine(this.left)
+    },
+    rightLine() {
+      return this.createVerticalLine(this.right)
+    },
+
     plankTop() {
       return this.createPlank({
         name: 'Вехняя граница',
@@ -101,22 +135,66 @@ export default {
   mounted() {},
 
   methods: {
+    selectAverage(item) {
+      console.log(item)
+    },
+
+    click(data) {
+      // console.log(data)
+
+      const index = data.points[0].pointIndex
+
+      if (this.isLeft) {
+        this.leftIndex = index
+      } else {
+        this.rightIndex = index
+      }
+      this.isLeft = !this.isLeft
+      this.updateShapes()
+    },
+
+    createLine(options) {
+      const defaultOptions = {
+        xref: 'x',
+        yref: 'y',
+        line: {
+          color: 'red',
+          width: 4,
+          dash: 'dot',
+        },
+      }
+
+      return {
+        type: 'line',
+        ...defaultOptions,
+        ...options,
+      }
+    },
+
+    updateShapes() {
+      this.defaultLayout.shapes = [this.leftLine, this.rightLine]
+    },
+
+    createVerticalLine(x) {
+      return this.createLine({ x0: x, x1: x, yref: 'paper', y0: 0, y1: 1 })
+    },
+
     updateTop(value) {
-      if (value < this.bottom.value) return
+      // if (value < this.bottom.value) return
       this.top.value = value
       this.top.visible = true
-      this.updateData(this.fileData)
+      this.updateData(this.traces)
     },
     updateBottom(value) {
-      if (value > this.top.value) return
+      // if (value > this.top.value) return
       this.bottom.value = value
       this.bottom.visible = true
-      this.updateData(this.fileData)
+      this.updateData(this.traces)
     },
     updateAverage() {
       this.average.value = this.calcAverage
       this.average.visible = true
-      this.updateData(this.fileData)
+      this.updateData(this.traces)
     },
 
     createPlank(options) {
@@ -146,16 +224,30 @@ export default {
     },
 
     correctData({ data }) {
+      this.fileData = data
+
       const fields = data.slice(0, 1)[0].map((item) => item.trim())
 
       const createSeries = (fieldIndex, name) =>
         this.getSeries(data.slice(1, data.length), 0, fieldIndex, name)
 
-      this.fileData = fields
+      this.traces = fields
         .slice(1, fields.length)
         .map((item, index) => createSeries(index + 1, item))
       this.range = this.getGlobalRange(data)
-      this.updateData(this.fileData)
+      this.selectedItem = this.traces.map((item, index) => ({
+        value: index,
+        text: item.name,
+      }))
+
+      // this.leftIndex = 1
+      // this.rightIndex = this.data.length - 1
+
+      // console.log(this.range)
+
+      this.updateShapes()
+      this.updateData(this.traces)
+
       this.loading = false
     },
 
@@ -191,53 +283,8 @@ export default {
       return [data[1][0], data[data.length - 2][0]]
     },
 
-    // updateUtils(data) {
-    //   // console.log(this.range)
-    //   // const top = this.createPlank({
-    //   //   name: 'Вехняя граница',
-    //   //   visible: this.top.visible,
-    //   //   x: this.range,
-    //   //   y: [this.top, this.top],
-    //   // })
-    //
-    //   const bottom = this.createPlank({
-    //     name: 'Нижняя граница',
-    //     visible: this.bottom.visible,
-    //     x: this.range,
-    //     y: [this.bottom, this.bottom],
-    //     line: {
-    //       dash: 'dot',
-    //     },
-    //   })
-    //
-    //   const average = this.createPlank({
-    //     name: 'Среднее значение',
-    //     visible: this.average.visible,
-    //     x: this.range,
-    //     y: [this.average.value, this.average.value],
-    //     line: {
-    //       dash: 'dot',
-    //     },
-    //   })
-    //
-    //   // console.log(top)
-    //
-    //   return [top, bottom, average]
-    // },
-
     dateRound(value) {
       return Math.round(Date.parse(value) / 1000) * 1000
-    },
-
-    zoom(data) {
-      console.log(data)
-      this.range = [
-        this.dateRound(data['xaxis.range[0]']),
-        this.dateRound(data['xaxis.range[1]']),
-      ]
-      console.log(this.range)
-      this.average.value = this.calcAverage
-      console.log(this.range)
     },
   },
 }

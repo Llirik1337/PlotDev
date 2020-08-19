@@ -27,6 +27,7 @@ export default {
   data: () => ({
     defaultSettings: {
       layout: {
+        height: 600,
         xaxis: {
           type: 'date',
           gridcolor: '#767',
@@ -58,10 +59,14 @@ export default {
     data() {
       this.upload()
     },
+    layout() {
+      this.upload()
+    },
   },
 
   mounted() {
     this.upload()
+    this.initEvents()
   },
 
   methods: {
@@ -72,8 +77,10 @@ export default {
         .on('plotly_relayout', (data) => this.$emit('plot-zoom', data))
     },
     upload() {
-      Plotly.react(this.container, this.data, this.getLayout)
-      this.initEvents()
+      Plotly.react(this.container, this.data, this.getLayout, {
+        scrollZoom: true,
+        displaylogo: false,
+      })
     },
   },
 }

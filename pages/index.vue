@@ -167,13 +167,13 @@ export default {
     plankAverage() {
       console.log(this.range)
       return this.createPlank({
-        name: 'Среднее значение',
+        name: `Среднее значение (${this.average.value.toFixed(2)})`,
         visible: this.average.visible,
         x: this.range,
         y: [this.average.value, this.average.value],
         line: {
           dash: 'dot',
-          color: 'gray',
+          color: 'red',
         },
       })
     },

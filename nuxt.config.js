@@ -1,5 +1,4 @@
 import colors from 'vuetify/es5/util/colors'
-import webpack from 'webpack'
 export default {
   /*
    ** Nuxt rendering mode
@@ -37,7 +36,7 @@ export default {
    ** Plugins to load before mounting the App
    ** https://nuxtjs.org/guide/plugins
    */
-  plugins: ['~/plugins/mathjs.js'],
+  plugins: ['~/plugins/mathjs.js', '~/plugins/moment.js'],
   /*
    ** Auto import components
    ** See https://nuxtjs.org/api/configuration-components

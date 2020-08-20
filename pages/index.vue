@@ -15,12 +15,12 @@
         </v-col>
         <v-col>
           <div v-if="range">
-            {{ rangeFile[0] }} -
-            {{ rangeFile[1] }}
-          </div>
-          <div v-if="range">
-            {{ min }} -
-            {{ max }}
+            <div>
+              {{ rangeFile[0] }} - ({{ timeAgo }})
+              {{ rangeFile[1] }}
+            </div>
+            <div>Min: {{ min }}</div>
+            <div>Max: {{ max }}</div>
           </div>
 
           <chart
@@ -86,6 +86,16 @@ export default {
   }),
 
   computed: {
+    timeAgo() {
+      console.log(this.$moment)
+      const [left, right] = [
+        this.$moment(this.rangeFile[0]),
+        this.$moment(this.rangeFile[1]),
+      ]
+      console.log(left.from(right))
+      return left.from(right)
+    },
+
     rangeIndex() {
       if (!this.leftIndex || !this.rightIndex) return false
       if (this.rightIndex < this.leftIndex)

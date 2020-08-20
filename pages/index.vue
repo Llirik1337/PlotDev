@@ -18,6 +18,10 @@
             {{ rangeFile[0] }} -
             {{ rangeFile[1] }}
           </div>
+          <div v-if="range">
+            {{ min }} -
+            {{ max }}
+          </div>
 
           <chart
             :options="options"
@@ -76,6 +80,8 @@ export default {
       },
     ],
     currentItem: 0,
+    min: 0,
+    max: 0,
     fileData: [],
   }),
 
@@ -120,7 +126,6 @@ export default {
       const left = this.rangeIndex[0]
       const right = this.rangeIndex[1]
       let data = []
-      console.log(this.currentItem)
       if (this.currentItem !== null) {
         const yValues = this.traces[this.currentItem].y
         data = yValues.slice(left, right)
@@ -129,11 +134,8 @@ export default {
           data = data.concat(trace.y.slice(left, right))
         }
       }
-      // console.log(data)
-      // if (!data.length) return 0
-
       const mean = this.$math.mean(data)
-      console.log(mean)
+      this.calcMinMax(data)
       return mean
     },
 
@@ -192,6 +194,11 @@ export default {
   },
 
   methods: {
+    calcMinMax(data) {
+      this.min = this.$math.min(data)
+      this.max = this.$math.max(data)
+    },
+
     selectAverage(item) {
       // console.log(item)
       this.currentItem = item

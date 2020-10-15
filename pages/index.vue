@@ -52,7 +52,7 @@ export default {
     options: {},
     loading: true,
     defaultLayout: {
-      title: 'График',
+      title: 'Динамические характеристики',
       shapes: [],
     },
     top: {

@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card flat>
     <v-card-title>
       <slot name="title">
         {{ title }}
@@ -7,12 +7,12 @@
     </v-card-title>
     <v-card-text>
       <slot>
-        <v-select :items="items" v-model="selected"></v-select>
+        <v-select small-chips :items="items" v-model="selected"></v-select>
       </slot>
     </v-card-text>
     <v-card-actions>
       <slot>
-        <v-btn color="primary" @click="$emit('select', selected)">
+        <v-btn small color="primary" @click="$emit('select', selected)">
           {{ textBtn }}
         </v-btn>
       </slot>
@@ -33,7 +33,7 @@ export default {
     },
     title: {
       type: String,
-      default: 'Выбор',
+      default: 'Выбор параметра',
     },
   },
   data: () => ({
@@ -41,5 +41,3 @@ export default {
   }),
 }
 </script>
-
-<style scoped></style>

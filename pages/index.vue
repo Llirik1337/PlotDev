@@ -1,11 +1,9 @@
 <template>
-  <v-card :loading="loading">
-    <v-card-title>
-      График
-    </v-card-title>
+  <v-card :loading="loading" flat tile>
+    <v-card-title> График </v-card-title>
     <v-card-text v-if="!loading">
       <v-row>
-        <v-col cols="3">
+        <v-col cols="2">
           <chart-input label="Вехняя граница" @save="updateTop" />
           <chart-input label="Нижняя граница" @save="updateBottom" />
           <chart-select
@@ -15,10 +13,7 @@
         </v-col>
         <v-col>
           <div v-if="range">
-            <div>
-              {{ rangeFile[0] }} - ({{ timeAgo }})
-              {{ rangeFile[1] }}
-            </div>
+            <div>{{ rangeFile[0] }} - ({{ timeAgo }}) - {{ rangeFile[1] }}</div>
             <div>Min: {{ min }}</div>
             <div>Max: {{ max }}</div>
           </div>
@@ -35,7 +30,7 @@
     </v-card-text>
     <v-card-actions>
       <v-file-input
-        label="File input"
+        label="Выбрать файл"
         outlined
         dense
         @change="upload"
@@ -366,3 +361,12 @@ export default {
   },
 }
 </script>
+
+<style>
+* {
+  font-size: small;
+}
+.v-card__title {
+  font-size: medium;
+}
+</style>

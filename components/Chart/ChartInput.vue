@@ -10,7 +10,7 @@
     </v-card-text>
     <v-card-actions>
       <slot name="actions">
-        <v-btn color="primary" @click.stop="$emit('save', value)">
+        <v-btn small color="primary" @click.stop="$emit('save', value)">
           Сохранить
         </v-btn>
       </slot>

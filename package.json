@@ -28,7 +28,7 @@
     "express": "^4.17.1",
     "moment": "^2.27.0",
     "nuxt": "^2.14.0",
-    "nuxt-highcharts": "^1.0.1",
+    "nuxt-highcharts": "^1.0.8",
     "papaparse": "^5.2.0",
     "plotly.js-dist": "^1.54.7",
     "vue-chartjs": "^3.5.0"

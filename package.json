@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "main": "main.js",
-  "author": {"name": "Llirik1337", "email": "aleshinwork.1337@gmail.com", "url": "https://github.com/Llirik1337"},
+  "author": {
+    "name": "Llirik1337",
+    "email": "aleshinwork.1337@gmail.com",
+    "url": "https://github.com/Llirik1337"
+  },
   "description": "Assistant program",
   "scripts": {
     "dev": "nuxt",
@@ -16,7 +20,9 @@
     "test": "jest",
     "package": "electron-forge package",
     "make": "electron-forge make",
-    "prod": "npm run generate && npm run package && npm run make"
+    "prod": "npm run generate && npm run package && npm run make",
+    "prepare": "npm run snyk-protect",
+    "snyk-protect": "snyk-protect"
   },
   "dependencies": {
     "@nuxtjs/axios": "^5.12.0",
@@ -31,7 +37,8 @@
     "nuxt-highcharts": "^1.0.1",
     "papaparse": "^5.2.0",
     "plotly.js-dist": "^1.54.7",
-    "vue-chartjs": "^3.5.0"
+    "vue-chartjs": "^3.5.0",
+    "@snyk/protect": "latest"
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.0.0-beta.54",
@@ -86,5 +93,6 @@
         }
       ]
     }
-  }
+  },
+  "snyk": true
 }

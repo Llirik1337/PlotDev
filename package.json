@@ -19,8 +19,8 @@
     "prod": "npm run generate && npm run package && npm run make"
   },
   "dependencies": {
-    "@nuxtjs/axios": "^5.12.0",
-    "@nuxtjs/pwa": "^3.0.0-beta.20",
+    "@nuxtjs/axios": "^5.12.3",
+    "@nuxtjs/pwa": "^3.0.0",
     "babel-preset-es2015": "^6.24.1",
     "chart.js": "^2.9.3",
     "chartjs-plugin-crosshair": "^1.1.6",
